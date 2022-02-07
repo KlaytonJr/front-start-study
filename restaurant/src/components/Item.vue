@@ -15,18 +15,23 @@
 </template>
 
 <script>
+import Mixin from '@/mixins/mixins';
+
 export default {
     name: 'Item',
+    mixins: [Mixin],
     props: {
         item: {}
     },
     filters: {
         currency(value) {
+            if(!value) return;
             return `R$ ${value.toLocaleString('pt-br', {minimumFractionDigits: 2})}`
         }
     },
     computed: {
         imagePath() {
+            if (!this.item.id) return;
             return require(`../assets/images/${this.selectedCategory}/${this.item.id}.png`);
         },
         selectedCategory() {
@@ -35,7 +40,13 @@ export default {
     },
     methods: {
         addToCart() {
-            this.$store.dispatch('addToCart', this.item);
+            // Se não for mobile
+            if (this.isDesktop()) {
+                this.$store.dispatch('addToCart', this.item);
+                return;
+            }
+
+            this.$router.push({ name: 'AddToCart', params: { id: this.item.id } });
         }
     }
 }
@@ -102,7 +113,7 @@ export default {
         margin-top: 10px;
     }
 
-    @media @tablets {
+    @media @smartphones {
         width: 100%;
         height: fit-content;
         border: 1px solid @light-grey;

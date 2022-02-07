@@ -1,27 +1,44 @@
 <template>
     <div class="item">
-        <div class="item--quantity">
-            <button class="button" @click="decreaseQuantity(item.id)" :disabled="item.quantity <= 0">-</button>
-            <span class="number">{{item.quantity}}</span>
-            <button class="button" @click="increaseQuantity(item.id)">+</button>
-        </div>
+        <Quantity :item="item" class="item--quantity"/>
         <div class="item--img-container">
             <img class="item--img" :src="imagePath">
         </div>
         <div class="content">
             <h3 class="item--name">{{item.name}}</h3>
-            <p class="item--observation">Adicionar observação</p>
+            <p class="item--observation" @click="onShowObservationModal">Adicionar observação</p>
+            <p class="item--observation-text">{{item.observations}}</p>
         </div>
         <p class="item--price">{{item.price | currency}}</p>
+        <Modal :show="showObservationModal" @on-modal-close="onCloseObservationModal">
+            <div class="modal-content">
+                <h2>Adicionar observação</h2>
+                <textarea v-model="item.observations" rows="8"></textarea>
+                <button class="secondary-button" @click="onCloseObservationModal">Cancelar</button>
+                <button class="primary-button" @click="onSaveObservationModal">Salvar</button>
+            </div>
+        </Modal>
     </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions } from 'vuex';
+import Quantity from './Quantity';
+import Modal from './Modal.vue';
+
 export default {
     name: 'CartItem',
+    components: {
+        Quantity,
+        Modal
+    },
     props: {
         item: {}
+    },
+    data() {
+        return {
+            showObservationModal: false
+        }
     },
     filters: {
         currency(value) {
@@ -37,12 +54,19 @@ export default {
         }
     },
     methods: {
-        ...mapActions({
-            increaseQuantity: 'increaseQuantity',
-            decreaseQuantity: 'decreaseQuantity'
-        })
+        ...mapActions([ 'increaseQuantity', 'decreaseQuantity']),
+        onShowObservationModal() {
+            this.showObservationModal = true;
+        },
+        onCloseObservationModal() {
+            this.showObservationModal = false;
+        },
+        onSaveObservationModal() {
+            this.$store.dispatch('assObservation', this.item);
+            this.showObservationModal = false;
+        }
     }
-}
+};
 </script>
 
 <style lang="less" scoped>
@@ -103,6 +127,12 @@ export default {
         font-size: 12px;
         color: @dark-grey;
         text-decoration: underline;
+        cursor: pointer;
+    }
+
+    &--observation-text {
+        font-size: 12px;
+        color: @dark-grey;
     }
 
     .content {
@@ -115,6 +145,19 @@ export default {
         font-size: 18px;
         line-height: 27px;
         color: @yellow;
+    }
+
+    .modal-content {
+        text-align: center;
+
+        textarea {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        button + button {
+            margin-left: 15px;
+        }
     }
 
     @media @tablets {
@@ -138,8 +181,14 @@ export default {
 
         &--price {
             order: 4;
-            padding: 0;
+            padding: 0 20px;
             margin: 5px 0;
+        }
+
+        .modal-content {
+            h2 {
+                font-size: 20px;
+            }
         }
     }
 }

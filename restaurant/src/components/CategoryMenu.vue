@@ -111,15 +111,17 @@ export default {
         }
     }
 
-    @media @tablets {
+    @media @small-desktops {
         width: 100%;
+        max-width: 800px;
+        margin: auto;
         height: fit-content;
 
 
         ul {
             display: flex;
 
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: center;
 
             margin: 20px;
@@ -128,6 +130,12 @@ export default {
             li {
                 min-width: 78px;
             }
+        }
+    }
+
+    @media @smartphones {
+        ul {
+            justify-content: unset;
         }
     }
 }
