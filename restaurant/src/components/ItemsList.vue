@@ -46,7 +46,7 @@ export default {
             this.itemsList = [];
 
             setTimeout(() => {
-                axios.get(`http://localhost:3000/${this.selectedCategory}`)
+                axios.get(`https://my-json-server.typicode.com/KlaytonJr/restaurant-api/${this.selectedCategory}`)
                 .then((response) => {
                     this.itemsList = response.data;
                     this.isLoading = false;
